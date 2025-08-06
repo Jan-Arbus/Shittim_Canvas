@@ -1,17 +1,32 @@
 name: Build Shittm Canvas
 
-on: [workflow_dispatch]
+on:
+  push:
+    branches:
+      - dev
+      - actions
+  workflow_dispatch:
 
 jobs:
   build:
-    name: Build Shittm Canvas
+    name: Build Project
     runs-on: windows-latest
     steps:
-      # Checkout
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          lfs: true
+      # 1. 清理工作目录
+      - name: Clean workspace
+        run: |
+          Remove-Item * -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item .* -Recurse -Force -ErrorAction SilentlyContinue
+
+      # 2. Clone 外部仓库（改成你要的仓库地址和分支）
+      - name: Clone External Project
+        run: |
+          git clone https://github.com/Jan-Arbus/Shittim_Canvas.git --depth=1 -b main ProjectSource
+
+      # 3. 切换到项目目录
+      - name: Move project files
+        run: |
+          Get-ChildItem ProjectSource -Force | Move-Item -Destination . -Force
 
       # Cache
       - uses: actions/cache@v3
